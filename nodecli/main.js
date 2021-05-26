@@ -1,6 +1,6 @@
 const program = require('commander');
 const fs = require('fs');
-const marked = require('marked');
+const md2html = require('./md2html');
 
 program.option('--gfm', 'GitHub Flavored Markdown を有効にする');
 program.parse(process.argv);
@@ -15,6 +15,6 @@ fs.readFile(filePath, { encoding: 'utf-8' }, (err, file) => {
     console.error(err.message);
     return process.exit(1);
   }
-  const html = marked(file, markedOptions);
+  const html = md2html(file, markedOptions);
   console.log(html);
 });
