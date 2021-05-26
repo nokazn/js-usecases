@@ -1,8 +1,7 @@
 'use strict';
 
 const getUsername = () => {
-  const input = document.getElementById('input');
-  return input.value;
+  return document.getElementById('userId').value;
 };
 
 const displayView = (view) => {
@@ -39,28 +38,29 @@ const viewer = (user) => escapeHTML`
 </dl>
 `;
 
-const fetchUser = async (userId) => {
+const fetchUser = (userId) => {
   return fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`).then((res) => {
     return res.ok ? res.json() : Promise.reject(new Error(`${res.status}`));
   });
 };
 
-const main = () => {
+const main = async () => {
   const userId = getUsername();
   if (!userId) {
     alert('Please input user ID');
     return;
   }
 
-  fetchUser(userId)
-    .then((user) => viewer(user))
-    .then((view) => displayView(view))
-    .catch((err) => {
-      console.error(err);
-      if (err.message === '404') {
-        displayView(`<h4>Not Found</h4>`);
-      } else {
-        displayView(`<h4>${err}</h4>`);
-      }
-    });
+  try {
+    const user = await fetchUser(userId);
+    const view = viewer(user);
+    displayView(view);
+  } catch (err) {
+    console.error(err);
+    if (err.message === '404') {
+      displayView(`<h4>Not Found</h4>`);
+    } else {
+      displayView(`<h4>${err}</h4>`);
+    }
+  }
 };
