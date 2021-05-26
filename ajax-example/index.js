@@ -5,6 +5,11 @@ const getUsername = () => {
   return input.value;
 };
 
+const displayView = (view) => {
+  const result = document.getElementById('result');
+  result.innerHTML = view;
+};
+
 const escapeSpecialChars = (str) => {
   return str
     .replace(/&/g, '&amp;')
@@ -34,36 +39,28 @@ const viewer = (user) => escapeHTML`
 </dl>
 `;
 
-const fetchUser = async () => {
+const fetchUser = async (userId) => {
+  return fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`).then((res) => {
+    return res.ok ? res.json() : Promise.reject(new Error(`${res.status}`));
+  });
+};
+
+const main = () => {
   const userId = getUsername();
   if (!userId) {
     alert('Please input user ID');
     return;
   }
 
-  const result = document.getElementById('result');
-  fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`)
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      if (res.status === 404) {
-        result.innerHTML = '<h4>Not Found</h4>';
-      } else {
-        result.innerHTML = '<h4>An error occurred</h4>';
-      }
-    })
-    .then((user) => {
-      if (user != null) {
-        result.innerHTML = viewer(user);
-      }
-    })
+  fetchUser(userId)
+    .then((user) => viewer(user))
+    .then((view) => displayView(view))
     .catch((err) => {
       console.error(err);
-      return undefined;
+      if (err.message === '404') {
+        displayView(`<h4>Not Found</h4>`);
+      } else {
+        displayView(`<h4>${err}</h4>`);
+      }
     });
-};
-
-const main = () => {
-  fetchUser();
 };
