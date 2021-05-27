@@ -1,5 +1,6 @@
 import { TodoListModel } from './model/TodoListModel.js';
 import { TodoItemModel } from './model/TodoItemModel.js';
+import { TodoListView } from './view/TodoListView.js';
 import { element, render } from './view/html-util.js';
 
 export class App {
@@ -10,33 +11,21 @@ export class App {
   mount() {
     const formElement = document.querySelector('#js-form');
     const inputElement = document.querySelector('#js-form-input');
+    console.log(inputElement.value);
     const containerElement = document.querySelector('#js-todo-list');
     const todoItemCountElement = document.querySelector('#js-todo-count');
     this.todoListModel.onChange(() => {
-      const todoListElement = element`<ul />`;
+      // const todoListElement = element`<ul />`;
       const todoItems = this.todoListModel.getTodoItems();
-      // それぞれの TodoItem 要素を todoListElement 以下へ追加する
-      todoItems.forEach((item) => {
-        const todoItemElement = item.completed
-          ? element`<li><input type="checkbox" class="checkbox" checked><s>${item.title}</s><button class="delete">x</button></li>`
-          : element`<li><input type="checkbox" class="checkbox">${item.title}<button class="delete">x</button></li>`;
-        const inputCheckboxElement = todoItemElement.querySelector('.checkbox');
-        inputCheckboxElement.addEventListener('change', () => {
-          this.todoListModel.updateTodo({
-            id: item.id,
-            completed: !item.completed,
-          });
-        });
-
-        const deleteButtonElement = todoItemElement.querySelector('.delete');
-        deleteButtonElement.addEventListener('click', () => {
-          this.todoListModel.deleteTodo({
-            id: item.id,
-          });
-        });
-        todoListElement.appendChild(todoItemElement);
+      const todoListView = new TodoListView();
+      const todoListElement = todoListView.createElement(todoItems, {
+        onUpdateTodo: ({ id, completed }) => {
+          this.todoListModel.updateTodo({ id, completed });
+        },
+        onDeleteTodo: ({ id }) => {
+          this.todoListModel.deleteTodo({ id });
+        },
       });
-      // containerElement の中身を todoListElement で上書きする
       render(todoListElement, containerElement);
       // アイテム数の表示を更新
       todoItemCountElement.textContent = `Todo アイテム数: ${this.todoListModel.getTotalCount()}`;
