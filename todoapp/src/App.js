@@ -28,11 +28,9 @@ export class App {
   mount() {
     const formElement = document.querySelector('#js-form');
     const inputElement = document.querySelector('#js-form-input');
-    console.log(inputElement.value);
     const containerElement = document.querySelector('#js-todo-list');
     const todoItemCountElement = document.querySelector('#js-todo-count');
     this.todoListModel.onChange(() => {
-      // const todoListElement = element`<ul />`;
       const todoItems = this.todoListModel.getTodoItems();
       const todoListView = new TodoListView();
       const todoListElement = todoListView.createElement(todoItems, {
@@ -51,12 +49,7 @@ export class App {
     formElement.addEventListener('submit', (event) => {
       // submit イベントの本来の動作を止める
       event.preventDefault();
-      this.handleAdd(
-        new TodoItemModel({
-          title: inputElement.value,
-          completed: false,
-        }),
-      );
+      this.handleAdd(inputElement.value);
       // 入力欄をから文字列にしてリセットする
       inputElement.value = '';
     });

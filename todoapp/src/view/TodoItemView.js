@@ -10,7 +10,6 @@ export class TodoItemView {
    * @returns {Element}
    */
   createElement(todoItem, { onUpdateTodo, onDeleteTodo }) {
-    console.log(todoItem);
     const todoItemElement = todoItem.completed
       ? element`<li><input type="checkbox" class="checkbox" checked><s>${todoItem.title}</s><button class="delete">x</button></li>`
       : element`<li><input type="checkbox" class="checkbox">${todoItem.title}<button class="delete">x</button></li>`;
